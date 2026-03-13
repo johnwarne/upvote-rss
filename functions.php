@@ -185,20 +185,17 @@ function resizeImage($image_url, $max_width, $max_height) {
 	if (empty($image_url)) {
 		return [];
 	}
-	// Get the image extension
-	$image_extension = pathinfo($image_url, PATHINFO_EXTENSION);
-	// If the image exists in the cache, return the URL of the cached image file as the first element of the array
+	// Derive the cache key from the full image URL so query strings remain distinct
 	$cache_object_key = $image_url;
-	$cache_object_key = str_replace('.' . $image_extension, '', $cache_object_key);
 	$cache_object_key = str_replace(['http://', 'https://', 'www.'], '', $cache_object_key);
 	$cache_object_key = str_replace(['/', '.'], '-', $cache_object_key);
 	$cache_object_key = filter_var($cache_object_key, FILTER_SANITIZE_ENCODED);
 	$cache_object_key = substr($cache_object_key, 0, 100) . '-' . $max_width . 'x' . $max_height;
 	$cache_directory = UPVOTE_RSS_CACHE_ROOT . 'images/';
-	$cache_file = $cache_directory . $cache_object_key . '.' . $image_extension;
-	$request_uri = preg_replace('/\?.*/', '', $_SERVER['REQUEST_URI']);
-	$url_to_cache_file = getProtocol() . $_SERVER['HTTP_HOST'] . $request_uri . $cache_file;
-	if (file_exists($cache_file)) {
+	$cached_files = glob($cache_directory . $cache_object_key . '.*') ?: [];
+	if (!empty($cached_files)) {
+		$cache_file = $cached_files[0];
+		$url_to_cache_file = UPVOTE_RSS_URI . 'cache/images/' . basename($cache_file);
 		$image_size = getimagesize($cache_file);
 		return [
 			$url_to_cache_file,
@@ -212,26 +209,32 @@ function resizeImage($image_url, $max_width, $max_height) {
 		return [$image_url, '', ''];
 	}
 	$content_type = $headers['Content-Type'] ?? $headers['content-type'] ?? '';
+	if (is_array($content_type)) {
+		$content_type = end($content_type) ?: '';
+	}
+	$content_type = strtolower(trim(explode(';', $content_type, 2)[0]));
 	if (
 		!$content_type ||
-		!preg_match('/image/', $content_type)
+		!str_starts_with($content_type, 'image/')
 		) {
 		return [$image_url, '', ''];
 	}
 	// Get image type from headers
-	$image_type = $content_type;
-	$image_type = explode('/', $image_type);
+	$image_type = explode('/', $content_type, 2);
 	$image_type = $image_type[1] ?? '';
+	$output_extension = match ($image_type) {
+		'png' => 'png',
+		'jpeg', 'jpg' => 'jpg',
+		'gif' => 'gif',
+		'webp' => function_exists('imagewebp') ? 'webp' : 'jpg',
+		default => '',
+	};
 	// If the image type is not supported, return the original image URL
-	if (
-		$image_type != 'png' &&
-		$image_type != 'jpeg' &&
-		$image_type != 'jpg' &&
-		$image_type != 'webp' &&
-		$image_type != 'gif'
-	) {
+	if (empty($output_extension)) {
 		return [$image_url, '', ''];
 	}
+	$cache_file = $cache_directory . $cache_object_key . '.' . $output_extension;
+	$url_to_cache_file = UPVOTE_RSS_URI . 'cache/images/' . basename($cache_file);
 	$image_size = getimagesize($image_url);
 	// If the image size is empty, return the original image URL
 	if (empty($image_size)) {
@@ -273,13 +276,11 @@ function resizeImage($image_url, $max_width, $max_height) {
 		}
 	}
 	// Create a new image
-	if ($image_extension == 'png') {
-		$new_image = imagecreatetruecolor($new_width, $new_height);
-		$background = imagecolorallocate($new_image, 255, 255, 255);
-		imagecolortransparent($new_image, $background);
-		imagealphablending($new_image, false);
-		imagesavealpha($new_image, true);
-	} elseif ($image_extension == 'gif') {
+	if (
+		$output_extension == 'png' ||
+		$output_extension == 'gif' ||
+		$output_extension == 'webp'
+	) {
 		$new_image = imagecreatetruecolor($new_width, $new_height);
 		$background = imagecolorallocate($new_image, 255, 255, 255);
 		imagecolortransparent($new_image, $background);
@@ -300,18 +301,17 @@ function resizeImage($image_url, $max_width, $max_height) {
 		}
 	}
 	// Save the new image to the cache
-	if ($image_extension == 'png') {
+	if ($output_extension == 'png') {
 		imagepng($new_image, $cache_file);
 	}
-	elseif (
-		$image_extension == 'jpeg' ||
-		$image_extension == 'jpg' ||
-		$image_extension == 'webp'
-	) {
+	elseif ($output_extension == 'jpg') {
 		imagejpeg($new_image, $cache_file);
 	}
-	elseif ($image_extension == 'gif') {
+	elseif ($output_extension == 'gif') {
 		imagegif($new_image, $cache_file);
+	}
+	elseif ($output_extension == 'webp') {
+		imagewebp($new_image, $cache_file);
 	}
 	// Free up memory
 	imagedestroy($image);
