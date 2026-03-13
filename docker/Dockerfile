@@ -1,26 +1,23 @@
-FROM dunglas/frankenphp:1.9.0-php8.4.10-alpine AS build
-
-# Install required utilities and PHP extensions
-RUN apk add --no-cache --virtual .build-deps \
-    build-base freetype-dev libjpeg-turbo-dev libpng-dev libwebp-dev && \
-    install-php-extensions gd opcache apcu && \
-    apk del .build-deps && \
-    rm -rf /var/cache/apk/*
-
-# Final stage
-FROM dunglas/frankenphp:1.9.0-php8.4.10-alpine
+FROM dunglas/frankenphp:1.12.1-php8.4.18-alpine
 
 # Install su-exec and opcache
 RUN apk add --no-cache su-exec && \
     install-php-extensions gd opcache apcu
 
 # Copy the application files
-COPY . /app
+COPY app.php ajax.php config.php functions.php index.php progress-sse.php /app/
+COPY classes /app/classes
+COPY inc /app/inc
+COPY views /app/views
+COPY styles /app/styles
+COPY js /app/js
+COPY img /app/img
+COPY vendor /app/vendor
+COPY docker/Caddyfile /etc/caddy/Caddyfile
+COPY docker/entrypoint.sh /entrypoint.sh
 
-# Create necessary directories and move files
-RUN mkdir -p /app/cache /app/logs /data/caddy/locks && \
-	mv /app/docker/Caddyfile /etc/caddy/Caddyfile && \
-	mv /app/docker/entrypoint.sh /entrypoint.sh
+# Create necessary directories
+RUN mkdir -p /app/cache /app/logs /data/caddy/locks
 
 # Make the entrypoint script executable
 RUN chmod +x /entrypoint.sh

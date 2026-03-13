@@ -2,11 +2,16 @@
 .github
 .vscode
 .env
+.DS_Store
+**/.DS_Store
 cache
 composer.json
 composer.lock
 gulpfile.js
+LICENSE
 logs
 node_modules
 package-lock.json
 package.json
+README.md
+test.php
