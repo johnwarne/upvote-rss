@@ -11,7 +11,7 @@ error_reporting(E_ALL & ~E_NOTICE & ~E_DEPRECATED);
 
 
 // Set defaults
-const UPVOTE_RSS_VERSION            = '1.8.0';
+const UPVOTE_RSS_VERSION            = '1.8.1';
 const UPVOTE_RSS_CACHE_ROOT         = __DIR__ . '/cache/';
 const DEFAULT_PLATFORM              = 'lemmy';
 const DEFAULT_GITHUB_INSTANCE       = 'github.com';
