@@ -77,7 +77,7 @@ docker build -f docker/Dockerfile .
 
 ### Manual
 
-1. Clone this repository somewhere with PHP >= 8.1 installed.
+1. Clone this repository somewhere with PHP >= 8.2 installed.
 1. Open `index.php` in a browser to view the front end.
 1. Create an `.env` file in the root directory to override application defaults or to integrate with [Redis](#caching), [Ollama](#ai-summaries), [OpenAI](#ai-summaries), [Readability](#parsers), etc. (see supported [environment variables](#environment-variables))
 
