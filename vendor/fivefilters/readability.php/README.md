@@ -20,15 +20,13 @@ Version 2.1.0 - Up to date with Readability.js up to [19 Nov 2018](https://githu
 
 ## Requirements
 
-PHP 7.4+, ext-dom, ext-xml, and ext-mbstring. To install these dependencies (in the rare case your system does not have them already), you could try something like this in *nix like environments:
-
-`$ sudo apt-get install php7.4-xml php7.4-mbstring`
+PHP 8.1+, ext-dom, ext-xml, and ext-mbstring.
 
 ## How to use it
 
 First you have to require the library using composer:
 
-`composer require fivefilters/readability.php`
+`composer require "fivefilters/readability.php:>=3.0"`
 
 Then, create a Readability class and pass a Configuration class, feed the `parse()` function with your HTML and echo the variable:
 
@@ -41,7 +39,7 @@ use fivefilters\Readability\ParseException;
 
 $readability = new Readability(new Configuration());
 
-$html = file_get_contents('http://your.favorite.newspaper/article.html');
+$html = file_get_contents('https://your.favorite.newspaper/article.html');
 
 try {
     $readability->parse($html);
@@ -98,11 +96,11 @@ Then you pass this Configuration object to Readability. The following options ar
 
 - **MaxTopCandidates**: default value `5`, max amount of top level candidates.
 - **CharThreshold**: default value `500`, minimum amount of characters to consider that the article was parsed successful.
-- **ArticleByLine**: default value `false`, search for the article byline and remove it from the text. It will be moved to the article metadata. 
-- **StripUnlikelyCandidates**: default value `true`, remove nodes that are unlikely to have relevant information. Useful for debugging or parsing complex or non-standard articles. 
-- **CleanConditionally**: default value `true`, remove certain nodes after parsing to return a cleaner result. 
-- **WeightClasses**: default value `true`, weight classes during the rating phase. 
-- **FixRelativeURLs**: default value `false`, convert relative URLs to absolute. Like `/test` to `http://host/test`. 
+- **ArticleByline**: default value `false`, search for the article byline and remove it from the text. It will be moved to the article metadata.
+- **StripUnlikelyCandidates**: default value `true`, remove nodes that are unlikely to have relevant information. Useful for debugging or parsing complex or non-standard articles.
+- **CleanConditionally**: default value `true`, remove certain nodes after parsing to return a cleaner result.
+- **WeightClasses**: default value `true`, weight classes during the rating phase.
+- **FixRelativeURLs**: default value `false`, convert relative URLs to absolute. Like `/test` to `http://host/test`.
 - **SubstituteEntities**: default value `false`, disables the `substituteEntities` flag of libxml. Will avoid substituting HTML entities. Like `&aacute;` to á.
 - **NormalizeEntities**: default value `false`, converts UTF-8 characters to its HTML Entity equivalent. Useful to parse HTML with mixed encoding.
 - **OriginalURL**: default value `http://fakehost`, original URL from the article used to fix relative URLs.
@@ -127,51 +125,18 @@ In the log you will find information about the parsed nodes, why they were remov
 
 ## Limitations
 
-Of course the main limitation is PHP. Websites that load the content through lazy loading, AJAX, or any type of javascript fueled call will be ignored (actually, *not ran*) and the resulting text will be incorrect, compared to the readability.js results. All the articles you want to parse with readability.php need to be complete and all the content should be in the HTML already.  
+Websites that load the content through Javascript - lazy loading, AJAX - will not have their content extracted with Readability.php because Javascript is not executed.
 
 ## Known libxml parsing issues
 
-Readability.php as of version 3.0.0 uses a HTML5 parser. Earlier versions used libxml. The issues below apply to libxml parsing, so if you're using an earlier version of Readability.php (pre 3.0.0), or if you've set the parser to libxml in the configuration, read on...
-
-### Javascript spilling into the text body
-
-DOMDocument has some issues while parsing javascript with unescaped HTML on strings. Consider the following code:
-
-```html
-<div> <!-- Offending div without closing tag -->
-<script type="text/javascript">
-       var test = '</div>';
-       // I should not appear on the result
-</script>
-```
-
-If you would like to remove the scripts of the HTML (like readability does), you would expect ending up with just one div and one comment on the final HTML. The problem is that libxml takes that closing div tag inside the javascript string as a HTML tag, effectively closing the unclosed tag and leaving the rest of the javascript as a string within a P tag. If you save that node, the final HTML will end up like this:
-
-```html
-<div> <!-- Offending div without closing tag -->
-<p>';
-       // I should not appear on the result
-</p></div>
-```
-
-This is a libxml issue and not a Readability.php bug.
-
-There's a workaround for this: using the `summonCthulhu` option. This will remove all script tags **via regex**, which is not ideal because you may end up summoning [the lord of darkness](https://stackoverflow.com/a/1732454).
-
-### &nbsp entities disappearing
-
-`&nbsp` entities are converted to spaces automatically by libxml and there's no way to disable it.
-
-### Self closing tags rendering as fully expanded tags
-
-Self closing tags like `<br />` get automatically expanded to `<br></br`. No way to disable it in libxml.
+Readability.php as of version 3.0.0 uses a HTML5 parser. Earlier versions used libxml for parsing, which struggles with many HTML5 pages. See [Parsing HTML with PHP 8.4](https://blog.keyvan.net/p/parsing-html-with-php-84).
 
 ## Dependencies
 
 Readability.php uses
 
  * [HTML5-PHP](https://github.com/Masterminds/html5-php) to parse and serialise HTML.
- * [PSR Log](https://github.com/php-fig/log) interface to define the allowed type of loggers. 
+ * [PSR Log](https://github.com/php-fig/log) interface to define the allowed type of loggers.
  * [Monolog](https://github.com/Seldaek/monolog) is only required on development installations. (`--dev` option during `composer install`).
 
 ## To-do
@@ -182,7 +147,7 @@ Readability.php uses
 
 ## How it works
 
-Readability parses all the text with DOMDocument, scans the text nodes and gives the a score, based on the amount of words, links and type of element. Then it selects the highest scoring element and creates a new DOMDocument with all its siblings. Each sibling is scored to discard useless elements, like nav bars, empty nodes, etc.
+Readability scans and scores HTML elements based on the number of words, links and type of elements contained. Then it selects the highest scoring element and tries to remove any unnecessary elements contained inside, like nav bars, empty nodes, etc.
 
 ## Security
 
@@ -191,39 +156,33 @@ the output of Readability. We would also recommend using [CSP](https://developer
 restrictions to what you allow the resulting content to do. The Firefox integration of
 reader mode uses both of these techniques itself. Sanitizing unsafe content out of the input is explicitly not something we aim to do as part of Readability itself - there are other good sanitizer libraries out there, use them!
 
-## Testing
+## Development and testing
 
-Any version of PHP from 7.4 and above installed locally should be enough to develop new features and add new test cases. If you want to be 100% sure that your change doesn't create any issues with other versions of PHP, you can use the provided Docker containers to test currently in 7.4, 8.0, 8.1.
+If you want to be sure that your change doesn't create issues with other versions of PHP, you can use the provided Docker containers to test your changes against PHP 8.1 and up.
 
 If you use composer to download this this package, make sure you pass the `--prefer-source` flag, otherwise the `test/` folder won't be downloaded.
 
-You'll need Docker and Docker Compose for this. To run all the tests in the three PHP versions above, just type the following command:
+You'll need Docker and Docker Compose for this. To run all the tests in the supported PHP versions, type the following command:
 
 ```bash
 make test-all
 ```
 
-This will start all the containers and run all the tests on every supported version of PHP. If you want to test against a specific version, you can use `make test-7.4`, `make test-8.0`, or `make test-8.1`.
-
-### Different versions of libxml
-
-If you want to test against supported versions of PHP *AND* multiple versions of libxml, run `test-all-versions`. This will test against PHP versions 7.4 to 8.1 and libxml versions 2.9.10, 2.9.13 and 2.9.14. Normally you won't need to do this unless you think you've found a bug on an specific version of libxml.
+This will start all the containers and run all the tests on every supported version of PHP. If you want to test against a specific version, you can use `make test-8.1`, or `make test-8.2`, etc.
 
 ### Updating the expected tests
 
 If you've made an improvement to the code, you'll probably want to examine the Readability.php output for the test cases here. To do that, run the following command first from the root of the project folder:
 
-    docker-compose up -d php-7.4-libxml-2.9.10
+    docker-compose up -d php-8.3-libxml-2.9.14
 
 You should now have a docker image running with the project root folder mapped to /app/ on your Docker instance (see `docker-compose.yml`). Any changes to these files will be accessible from the Docker instance from now on.
 
-Next, create a folder in tests/ called /changed, then run the following command to run the test suite:
+    docker-compose exec -e output-changes=1 -e output-diff=1 php-8.3-libxml-2.9.14 php /app/vendor/phpunit/phpunit/phpunit --configuration /app/phpunit.xml
 
-    docker-compose exec -e output-changes=1 -e output-diff=1 php-7.4-libxml-2.9.10 php /app/vendor/phpunit/phpunit/phpunit --configuration /app/phpunit.xml
+The two environment variables (`output-changes=1` and `output-diff=1`) will result in new output for any failing test (along with a diff of changes) being written to the test/changed/ folder.
 
-The two environment variables (`output-changes=1` and `output-diff=1`) will result in new output for any failing test (along with a diff of changes) being written to the changed/ folder.
-
-If you're happy the changes are okay, set `output-diff=0` and the diff files will no longer be written, making it easier to copy the new expected output files over to their corresponding locations in test-pages\.
+If you're happy the changes are okay, set `output-diff=0` and the diff files will no longer be written, making it easier to copy the new expected output files over to their corresponding locations in test\test-pages\.
 
 ## License
 

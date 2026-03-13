@@ -13,80 +13,23 @@ class Configuration
 {
     use LoggerAwareTrait;
 
-    /**
-     * @var int
-     */
-    protected $maxTopCandidates = 5;
-
-    /**
-     * @var int
-     */
-    protected $charThreshold = 500;
-
-    /**
-     * @var bool
-     */
-    protected $articleByLine = false;
-
-    /**
-     * @var bool
-     */
-    protected $stripUnlikelyCandidates = true;
-
-    /**
-     * @var bool
-     */
-    protected $cleanConditionally = true;
-
-    /**
-     * @var bool
-     */
-    protected $weightClasses = true;
-
-    /**
-     * @var bool
-     */
-    protected $fixRelativeURLs = false;
-
-    /**
-     * @var bool
-     */
-    protected $substituteEntities = false;
-
-    /**
-     * @var bool
-     */
-    protected $normalizeEntities = false;
-
-    /**
-     * @var bool
-     */
-    protected $summonCthulhu = false;
-
-    /**
-     * @var string
-     */
-    protected $originalURL = 'http://fakehost';
-
-    /**
-     * @var string
-     */
-    protected $parser = 'html5';
-
-    /**
-     * @var bool
-     */
-    protected $keepClasses = false;
-
-    /**
-     * @var bool
-     */
-    protected $disableJSONLD = false;
+    protected int $maxTopCandidates = 5;
+    protected int $charThreshold = 500;
+    protected bool $articleByline = false;
+    protected bool $stripUnlikelyCandidates = true;
+    protected bool $cleanConditionally = true;
+    protected bool $weightClasses = true;
+    protected bool $fixRelativeURLs = false;
+    protected bool $substituteEntities = false;
+    protected bool $normalizeEntities = false;
+    protected bool $summonCthulhu = false;
+    protected string $originalURL = 'http://fakehost';
+    protected string $parser = 'html5';
+    protected bool $keepClasses = false;
+    protected bool $disableJSONLD = false;
 
     /**
      * Configuration constructor.
-     *
-     * @param array $params
      */
     public function __construct(array $params = [])
     {
@@ -100,10 +43,8 @@ class Configuration
 
     /**
      * Returns an array-representation of configuration.
-     *
-     * @return array
      */
-    public function toArray()
+    public function toArray(): array
     {
         $out = [];
         foreach ($this as $key => $value) {
@@ -117,9 +58,9 @@ class Configuration
     }
 
     /**
-     * @return LoggerInterface
+     * Get logger.
      */
-    public function getLogger()
+    public function getLogger(): LoggerInterface
     {
         // If no logger has been set, just return a null logger
         if ($this->logger === null) {
@@ -130,11 +71,9 @@ class Configuration
     }
 
     /**
-     * @param LoggerInterface $logger
-     *
-     * @return Configuration
+     * Set logger.
      */
-    public function setLogger(LoggerInterface $logger)
+    public function setLogger(LoggerInterface $logger): Configuration
     {
         $this->logger = $logger;
 
@@ -142,19 +81,17 @@ class Configuration
     }
 
     /**
-     * @return int
+     * Get max top candidates.
      */
-    public function getMaxTopCandidates()
+    public function getMaxTopCandidates(): int
     {
         return $this->maxTopCandidates;
     }
 
     /**
-     * @param int $maxTopCandidates
-     *
-     * @return $this
+     * Set max top candidates.
      */
-    public function setMaxTopCandidates($maxTopCandidates)
+    public function setMaxTopCandidates(int $maxTopCandidates): Configuration
     {
         $this->maxTopCandidates = $maxTopCandidates;
 
@@ -162,19 +99,17 @@ class Configuration
     }
 
     /**
-     * @return int
+     * Get char threshold.
      */
-    public function getCharThreshold()
+    public function getCharThreshold(): int
     {
         return $this->charThreshold;
     }
 
     /**
-     * @param int $charThreshold
-     *
-     * @return $this
+     * Set char threshold.
      */
-    public function setCharThreshold($charThreshold)
+    public function setCharThreshold(int $charThreshold): Configuration
     {
         $this->charThreshold = $charThreshold;
 
@@ -182,39 +117,35 @@ class Configuration
     }
 
     /**
-     * @return bool
+     * Get article by line.
      */
-    public function getArticleByLine()
+    public function getArticleByline(): bool
     {
-        return $this->articleByLine;
+        return $this->articleByline;
     }
 
     /**
-     * @param bool $articleByLine
-     *
-     * @return $this
+     * Set article by line.
      */
-    public function setArticleByLine($articleByLine)
+    public function setArticleByline(bool $articleByline): Configuration
     {
-        $this->articleByLine = $articleByLine;
+        $this->articleByline = $articleByline;
 
         return $this;
     }
 
     /**
-     * @return bool
+     * Get strip unlikely candidates.
      */
-    public function getStripUnlikelyCandidates()
+    public function getStripUnlikelyCandidates(): bool
     {
         return $this->stripUnlikelyCandidates;
     }
 
     /**
      * @param bool $stripUnlikelyCandidates
-     *
-     * @return $this
      */
-    public function setStripUnlikelyCandidates($stripUnlikelyCandidates)
+    public function setStripUnlikelyCandidates(bool $stripUnlikelyCandidates): Configuration
     {
         $this->stripUnlikelyCandidates = $stripUnlikelyCandidates;
 
@@ -222,19 +153,17 @@ class Configuration
     }
 
     /**
-     * @return bool
+     * Get clean conditionally.
      */
-    public function getCleanConditionally()
+    public function getCleanConditionally(): bool
     {
         return $this->cleanConditionally;
     }
 
     /**
-     * @param bool $cleanConditionally
-     *
-     * @return $this
+     * Set clean conditionally.
      */
-    public function setCleanConditionally($cleanConditionally)
+    public function setCleanConditionally(bool $cleanConditionally): Configuration
     {
         $this->cleanConditionally = $cleanConditionally;
 
@@ -242,19 +171,17 @@ class Configuration
     }
 
     /**
-     * @return bool
+     * Get weight classes.
      */
-    public function getWeightClasses()
+    public function getWeightClasses(): bool
     {
         return $this->weightClasses;
     }
 
     /**
-     * @param bool $weightClasses
-     *
-     * @return $this
+     * Set weight classes.
      */
-    public function setWeightClasses($weightClasses)
+    public function setWeightClasses(bool $weightClasses): Configuration
     {
         $this->weightClasses = $weightClasses;
 
@@ -262,19 +189,17 @@ class Configuration
     }
 
     /**
-     * @return bool
+     * Get fix relative URLs.
      */
-    public function getFixRelativeURLs()
+    public function getFixRelativeURLs(): bool
     {
         return $this->fixRelativeURLs;
     }
 
     /**
-     * @param bool $fixRelativeURLs
-     *
-     * @return $this
+     * Set fix relative URLs.
      */
-    public function setFixRelativeURLs($fixRelativeURLs)
+    public function setFixRelativeURLs(bool $fixRelativeURLs): Configuration
     {
         $this->fixRelativeURLs = $fixRelativeURLs;
 
@@ -282,19 +207,17 @@ class Configuration
     }
 
     /**
-     * @return bool
+     * Get substitute entities.
      */
-    public function getSubstituteEntities()
+    public function getSubstituteEntities(): bool
     {
         return $this->substituteEntities;
     }
 
     /**
-     * @param bool $substituteEntities
-     *
-     * @return $this
+     * Set substitute entities.
      */
-    public function setSubstituteEntities($substituteEntities)
+    public function setSubstituteEntities(bool $substituteEntities): Configuration
     {
         $this->substituteEntities = $substituteEntities;
 
@@ -302,19 +225,17 @@ class Configuration
     }
 
     /**
-     * @return bool
+     * Get normalize entities.
      */
-    public function getNormalizeEntities()
+    public function getNormalizeEntities(): bool
     {
         return $this->normalizeEntities;
     }
 
     /**
-     * @param bool $normalizeEntities
-     *
-     * @return $this
+     * Set normalize entities.
      */
-    public function setNormalizeEntities($normalizeEntities)
+    public function setNormalizeEntities(bool $normalizeEntities): Configuration
     {
         $this->normalizeEntities = $normalizeEntities;
 
@@ -322,19 +243,17 @@ class Configuration
     }
 
     /**
-     * @return string
+     * Get original URL.
      */
-    public function getOriginalURL()
+    public function getOriginalURL(): string
     {
         return $this->originalURL;
     }
 
     /**
-     * @param string $originalURL
-     *
-     * @return $this
+     * Set original URL.
      */
-    public function setOriginalURL($originalURL)
+    public function setOriginalURL(string $originalURL): Configuration
     {
         $this->originalURL = $originalURL;
 
@@ -342,19 +261,17 @@ class Configuration
     }
 
     /**
-     * @return string
+     * Get parser.
      */
-    public function getParser()
+    public function getParser(): string
     {
         return $this->parser;
     }
 
     /**
-     * @param string $parser
-     *
-     * @return $this
+     * Set parser.
      */
-    public function setParser($parser)
+    public function setParser(string $parser): Configuration
     {
         $this->parser = $parser;
 
@@ -362,19 +279,17 @@ class Configuration
     }
 
     /**
-     * @return bool
+     * Get keep classes.
      */
-    public function getKeepClasses()
+    public function getKeepClasses(): bool
     {
         return $this->keepClasses;
     }
 
     /**
-     * @param bool $keepClasses
-     *
-     * @return $this
+     * Set keep classes.
      */
-    public function setKeepClasses($keepClasses)
+    public function setKeepClasses(bool $keepClasses): Configuration
     {
         $this->keepClasses = $keepClasses;
 
@@ -382,19 +297,17 @@ class Configuration
     }
 
     /**
-     * @return bool
+     * Get disable JSON-LD.
      */
-    public function getDisableJSONLD()
+    public function getDisableJSONLD(): bool
     {
         return $this->disableJSONLD;
     }
 
     /**
-     * @param bool $disableJSONLD
-     *
-     * @return $this
+     * Set disable JSON-LD.
      */
-    public function setDisableJSONLD($disableJSONLD)
+    public function setDisableJSONLD(bool $disableJSONLD): Configuration
     {
         $this->disableJSONLD = $disableJSONLD;
 
@@ -402,19 +315,17 @@ class Configuration
     }
 
     /**
-     * @return bool
+     * Get summon Cthulhu.
      */
-    public function getSummonCthulhu()
+    public function getSummonCthulhu(): bool
     {
         return $this->summonCthulhu;
     }
 
     /**
-     * @param bool $summonCthulhu
-     *
-     * @return $this
+     * Set summon Cthulhu.
      */
-    public function setSummonCthulhu($summonCthulhu)
+    public function setSummonCthulhu(bool $summonCthulhu): Configuration
     {
         $this->summonCthulhu = $summonCthulhu;
 

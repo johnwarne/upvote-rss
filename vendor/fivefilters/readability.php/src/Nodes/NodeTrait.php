@@ -6,7 +6,6 @@ use fivefilters\Readability\Nodes\DOM\DOMDocument;
 use fivefilters\Readability\Nodes\DOM\DOMElement;
 use fivefilters\Readability\Nodes\DOM\DOMNode;
 use fivefilters\Readability\Nodes\DOM\DOMText;
-use DOMNodeList;
 
 /**
  * @property ?DOMNode $firstChild
@@ -19,29 +18,20 @@ trait NodeTrait
 {
     /**
      * Content score of the node. Used to determine the value of the content.
-     *
-     * @var int
      */
-    public $contentScore = 0;
+    public float $contentScore = 0.0;
 
     /**
      * Flag for initialized status.
-     *
-     * @var bool
      */
-    private $initialized = false;
+    private bool $initialized = false;
 
     /**
-     * Flag data tables.
-     *
-     * @var bool
+     * Flag for data tables.
      */
-    private $readabilityDataTable = false;
+    private bool $readabilityDataTable = false;
 
-    /**
-     * @var array
-     */
-    private $divToPElements = [
+    private static array $DIV_TO_P_ELEMENTS = [
         'blockquote',
         'dl',
         'div',
@@ -56,10 +46,8 @@ trait NodeTrait
     /**
      * The commented out elements qualify as phrasing content but tend to be
      * removed by readability when put into paragraphs, so we ignore them here.
-     *
-     * @var array
      */
-    private $phrasing_elems = [
+    private static array $PHRASING_ELEMS = [
         // 'CANVAS', 'IFRAME', 'SVG', 'VIDEO',
         'abbr', 'audio', 'b', 'bdo', 'br', 'button', 'cite', 'code', 'data',
         'datalist', 'dfn', 'em', 'embed', 'i', 'img', 'input', 'kbd', 'label',
@@ -69,19 +57,17 @@ trait NodeTrait
     ];
 
     /**
-     * initialized getter.
-     *
-     * @return bool
+     * Is initialized getter.
      */
-    public function isInitialized()
+    public function isInitialized(): bool
     {
         return $this->initialized;
     }
 
     /**
-     * @return bool
+     * Check if this is a data table.
      */
-    public function isReadabilityDataTable()
+    public function isReadabilityDataTable(): bool
     {
         /*
          * This is a workaround that I'd like to remove in the future.
@@ -99,11 +85,10 @@ trait NodeTrait
     }
 
     /**
-     * @param bool $param
+     * Set data table flag.
      */
-    public function setReadabilityDataTable($param)
+    public function setReadabilityDataTable(bool $param): void
     {
-        // Can't be "true" because DOMDocument casts it to "1"
         $this->setAttribute('readabilityDataTable', $param ? '1' : '0');
 //        $this->readabilityDataTable = $param;
     }
@@ -113,11 +98,9 @@ trait NodeTrait
      *
      * @ TODO: I don't like the weightClasses param. How can we get the config here?
      *
-     * @param $weightClasses bool Weight classes?
-     *
-     * @return static
+     * @param bool $weightClasses Weight classes?
      */
-    public function initializeNode($weightClasses)
+    public function initializeNode(bool $weightClasses): static
     {
         if (!$this->isInitialized()) {
             $contentScore = 0;
@@ -166,12 +149,8 @@ trait NodeTrait
     /**
      * Override for native getAttribute method. Some nodes have the getAttribute method, some don't, so we need
      * to check first the existence of the attributes property.
-     *
-     * @param $attributeName string Attribute to retrieve
-     *
-     * @return string
      */
-    public function getAttribute($attributeName): string
+    public function getAttribute(string $attributeName): string
     {
         if (!is_null($this->attributes)) {
             return parent::getAttribute($attributeName);
@@ -183,13 +162,9 @@ trait NodeTrait
     /**
      * Override for native hasAttribute.
      *
-     * @param $attributeName
-     *
-     * @return bool
-     *
      * @see getAttribute
      */
-    public function hasAttribute($attributeName): bool
+    public function hasAttribute(string $attributeName): bool
     {
         if (!is_null($this->attributes)) {
             return parent::hasAttribute($attributeName);
@@ -202,10 +177,8 @@ trait NodeTrait
      * Get the ancestors of the current node.
      *
      * @param int|bool $maxLevel Max amount of ancestors to get. False for all of them
-     *
-     * @return array
      */
-    public function getNodeAncestors($maxLevel = 3): array
+    public function getNodeAncestors(int|bool $maxLevel = 3): array
     {
         $ancestors = [];
         $level = 0;
@@ -226,8 +199,6 @@ trait NodeTrait
 
     /**
      * Returns all links from the current element.
-     *
-     * @return array
      */
     public function getAllLinks(): array
     {
@@ -237,10 +208,8 @@ trait NodeTrait
     /**
      * Get the density of links as a percentage of the content
      * This is the amount of text that is inside a link divided by the total text in the node.
-     *
-     * @return int
      */
-    public function getLinkDensity()
+    public function getLinkDensity(): float
     {
         $textLength = mb_strlen($this->getTextContent(true));
         if ($textLength === 0) {
@@ -265,10 +234,8 @@ trait NodeTrait
 
     /**
      * Calculates the weight of the class/id of the current element.
-     *
-     * @return int
      */
-    public function getClassWeight()
+    public function getClassWeight(): int
     {
         $weight = 0;
 
@@ -303,10 +270,8 @@ trait NodeTrait
      * Returns the full text of the node.
      *
      * @param bool $normalize Normalize white space?
-     *
-     * @return string
      */
-    public function getTextContent($normalize = true)
+    public function getTextContent(bool $normalize = true): string
     {
         $nodeValue = trim($this->textContent);
         if ($normalize) {
@@ -318,10 +283,8 @@ trait NodeTrait
 
     /**
      * Return an array indicating how many rows and columns this table has.
-     *
-     * @return array
      */
-    public function getRowAndColumnCount()
+    public function getRowAndColumnCount(): array
     {
         $rows = $columns = 0;
         $trs = $this->getElementsByTagName('tr');
@@ -346,13 +309,8 @@ trait NodeTrait
 
     /**
      * Creates a new node based on the text content of the original node.
-     *
-     * @param $originalNode DOMNode
-     * @param $tagName string
-     *
-     * @return DOMElement
      */
-    public function createNode($originalNode, $tagName)
+    public function createNode(DOMNode $originalNode, string $tagName): DOMElement
     {
         $text = $originalNode->getTextContent(false);
         $newNode = $originalNode->ownerDocument->createElement($tagName, $text);
@@ -363,14 +321,8 @@ trait NodeTrait
     /**
      * Check if a given node has one of its ancestor tag name matching the
      * provided one.
-     *
-     * @param string $tagName
-     * @param int $maxDepth
-     * @param callable $filterFn
-     *
-     * @return bool
      */
-    public function hasAncestorTag($tagName, $maxDepth = 3, callable $filterFn = null)
+    public function hasAncestorTag(string $tagName, int $maxDepth = 3, ?callable $filterFn = null): bool
     {
         $depth = 0;
         $node = $this;
@@ -394,12 +346,8 @@ trait NodeTrait
     /**
      * Check if this node has only whitespace and a single element with given tag
      * or if it contains no element with given tag or more than 1 element.
-     *
-     * @param $tag string Name of tag
-     *
-     * @return bool
      */
-    public function hasSingleTagInsideElement($tag)
+    public function hasSingleTagInsideElement(string $tag): bool
     {
         // There should be exactly 1 element child with given tag
         if (count($children = NodeUtility::filterTextNodes($this->childNodes)) !== 1 || $children->item(0)->nodeName !== $tag) {
@@ -419,16 +367,14 @@ trait NodeTrait
 
     /**
      * Check if the current element has a single child block element.
-     * Block elements are the ones defined in the divToPElements array.
-     *
-     * @return bool
+     * Block elements are the ones defined in the DIV_TO_P_ELEMENTS array.
      */
-    public function hasSingleChildBlockElement()
+    public function hasSingleChildBlockElement(): bool
     {
         $result = false;
         if ($this->hasChildNodes()) {
             foreach ($this->childNodes as $child) {
-                if (in_array($child->nodeName, $this->divToPElements)) {
+                if (in_array($child->nodeName, self::$DIV_TO_P_ELEMENTS)) {
                     $result = true;
                 } else {
                     // If any of the hasSingleChildBlockElement calls return true, return true then.
@@ -443,10 +389,8 @@ trait NodeTrait
 
     /**
      * Determines if a node has no content or it is just a bunch of dividing lines and/or whitespace.
-     *
-     * @return bool
      */
-    public function isElementWithoutContent()
+    public function isElementWithoutContent(): bool
     {
         return $this instanceof DOMElement &&
             mb_strlen(preg_replace(NodeUtility::$regexps['onlyWhitespace'], '', $this->textContent)) === 0 &&
@@ -469,13 +413,11 @@ trait NodeTrait
 
     /**
      * Determine if a node qualifies as phrasing content.
-     * https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Content_categories#Phrasing_content.
-     *
-     * @return bool
+     * https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Content_categories#Phrasing_content
      */
-    public function isPhrasingContent()
+    public function isPhrasingContent(): bool
     {
-        return $this->nodeType === XML_TEXT_NODE || in_array($this->nodeName, $this->phrasing_elems) !== false ||
+        return $this->nodeType === XML_TEXT_NODE || in_array($this->nodeName, self::$PHRASING_ELEMS) !== false ||
             (!is_null($this->childNodes) &&
                 ($this->nodeName === 'a' || $this->nodeName === 'del' || $this->nodeName === 'ins') &&
                 array_reduce(iterator_to_array($this->childNodes), function ($carry, $node) {
@@ -487,23 +429,21 @@ trait NodeTrait
     /**
      * In the original JS project they check if the node has the style display=none, which unfortunately
      * in our case we have no way of knowing that. So we just check for the attribute hidden or "display: none".
-     *
-     * @return bool
      */
-    public function isProbablyVisible()
+    public function isProbablyVisible(): bool
     {
-        return !preg_match('/display:( )?none/i', $this->getAttribute('style')) && 
+        return !preg_match('/display:( )?none/i', $this->getAttribute('style')) &&
                 !$this->hasAttribute('hidden') &&
                 //check for "fallback-image" so that wikimedia math images are displayed
-                (!$this->hasAttribute('aria-hidden') || $this->getAttribute('aria-hidden') !== 'true' || ($this->hasAttribute('class') && strpos($this->getAttribute('class'), 'fallback-image') !== false));
+                (!$this->hasAttribute('aria-hidden') || $this->getAttribute('aria-hidden') !== 'true' || str_contains($this->getAttribute('class'), 'fallback-image'));
     }
 
     /**
-     * @return bool
+     * Check if node is whitespace.
      */
-    public function isWhitespace()
+    public function isWhitespace(): bool
     {
-        return ($this->nodeType === XML_TEXT_NODE && mb_strlen(trim($this->textContent)) === 0) ||
+        return ($this->nodeType === XML_TEXT_NODE && $this->isWhitespaceInElementContent()) ||
             ($this->nodeType === XML_ELEMENT_NODE && $this->nodeName === 'br');
     }
 
@@ -524,10 +464,8 @@ trait NodeTrait
      * used only when the results of the search are going to be used to remove the nodes.
      *
      * @param string $tag
-     *
-     * @return \Generator
      */
-    public function shiftingAwareGetElementsByTagName($tag)
+    public function shiftingAwareGetElementsByTagName(string $tag): \Generator
     {
         $nodes = $this->getElementsByTagName($tag);
         $count = $nodes->length;
@@ -547,19 +485,12 @@ trait NodeTrait
     }
 
     /**
-     * Mimics JS's firstElementChild property. PHP only has firstChild which could be any type of DOMNode. Use this
-     * function to get the first one that is an DOMElement node.
-     *
-     * @return DOMElement|null
+     * Git first element child or null
      */
-    public function getFirstElementChild()
+    public function getFirstElementChild(): ?DOMElement
     {
-        if ($this->childNodes instanceof \Traversable) {
-            foreach ($this->childNodes as $node) {
-                if ($node instanceof DOMElement) {
-                    return $node;
-                }
-            }
+        if ($this->nodeType === XML_ELEMENT_NODE || $this->nodeType === XML_DOCUMENT_NODE) {
+            return $this->firstElementChild;
         }
 
         return null;

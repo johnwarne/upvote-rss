@@ -10,12 +10,10 @@ class DOMElement extends \DOMElement
 
     /**
      * Returns the child elements of this element.
-     * 
-     * To get all child nodes, including non-element nodes like text and comment nodes, use childNodes.
      *
-     * @return DOMNodeList
+     * To get all child nodes, including non-element nodes like text and comment nodes, use childNodes.
      */
-    public function children()
+    public function children(): DOMNodeList
     {
         $newList = new DOMNodeList();
         foreach ($this->childNodes as $node) {
@@ -29,18 +27,10 @@ class DOMElement extends \DOMElement
     /**
      * Returns the Element immediately prior to the specified one in its parent's children list, or null if the specified element is the first one in the list.
      *
-     * @see https://wiki.php.net/rfc/dom_living_standard_api
-     * @return DOMElement|null
+     * @deprecated Use previousElementSibling instead - introduced in PHP 8.0.
      */
-    public function previousElementSibling()
+    public function previousElementSibling(): ?DOMElement
     {
-        $previous = $this->previousSibling;
-        while ($previous) {
-            if ($previous->nodeType === XML_ELEMENT_NODE) {
-                return $previous;
-            }
-            $previous = $previous->previousSibling;
-        }
-        return null;
+        return $this->previousElementSibling;
     }
 }

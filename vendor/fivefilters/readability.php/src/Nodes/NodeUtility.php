@@ -5,7 +5,11 @@ namespace fivefilters\Readability\Nodes;
 use fivefilters\Readability\Nodes\DOM\DOMDocument;
 use fivefilters\Readability\Nodes\DOM\DOMElement;
 use fivefilters\Readability\Nodes\DOM\DOMNode;
+use fivefilters\Readability\Nodes\DOM\DOMProcessingInstruction;
+use fivefilters\Readability\Nodes\DOM\DOMText;
+use fivefilters\Readability\Nodes\DOM\DOMComment;
 use fivefilters\Readability\Nodes\DOM\DOMNodeList;
+use fivefilters\Readability\Nodes\DOM\DOMCdataSection;
 
 /**
  * Class NodeUtility.
@@ -40,21 +44,17 @@ class NodeUtility
         'b64DataUrl' => '/^data:\s*([^\s;,]+)\s*;\s*base64\s*,/i',
         // See: https://schema.org/Article
         'jsonLdArticleTypes' => '/^Article|AdvertiserContentArticle|NewsArticle|AnalysisNewsArticle|AskPublicNewsArticle|BackgroundNewsArticle|OpinionNewsArticle|ReportageNewsArticle|ReviewNewsArticle|Report|SatiricalArticle|ScholarlyArticle|MedicalScholarlyArticle|SocialMediaPosting|BlogPosting|LiveBlogPosting|DiscussionForumPosting|TechArticle|APIReference$/'
-     
+
     ];
 
     /**
      * Finds the next node, starting from the given node, and ignoring
      * whitespace in between. If the given node is an element, the same node is
      * returned.
-     * 
+     *
      * Imported from the Element class on league\html-to-markdown.
-     *
-     * @param $node
-     *
-     * @return DOMNode
      */
-    public static function nextNode($node)
+    public static function nextNode(DOMNode|DOMComment|DOMText|DOMElement|null $node): DOMNode|DOMComment|DOMText|DOMElement|null
     {
         $next = $node;
         while ($next
@@ -69,14 +69,8 @@ class NodeUtility
     /**
      * Changes the node tag name. Since tagName on DOMElement is a read only value, this must be done creating a new
      * element with the new tag name and importing it to the main DOMDocument.
-     *
-     * @param DOMNode|DOMElement $node
-     * @param string $value
-     * @param bool $importAttributes
-     *
-     * @return DOMNode
      */
-    public static function setNodeTag($node, $value, $importAttributes = true)
+    public static function setNodeTag(DOMNode|DOMElement $node, string $value, bool $importAttributes = true): DOMNode|DOMElement
     {
         $new = new DOMDocument('1.0', 'utf-8');
         $new->appendChild($new->createElement($value));
@@ -104,12 +98,8 @@ class NodeUtility
 
     /**
      * Removes the current node and returns the next node to be parsed (child, sibling or parent).
-     *
-     * @param DOMNode|DOMElement $node
-     *
-     * @return DOMNode
      */
-    public static function removeAndGetNext($node)
+    public static function removeAndGetNext(DOMNode|DOMComment|DOMText|DOMElement|DOMProcessingInstruction $node): DOMNode|DOMComment|DOMText|DOMElement|DOMProcessingInstruction|null
     {
         $nextNode = self::getNextNode($node, true);
         $node->parentNode->removeChild($node);
@@ -119,12 +109,8 @@ class NodeUtility
 
     /**
      * Remove the selected node.
-     *
-     * @param $node DOMElement
-     *
-     * @return void
-     **/
-    public static function removeNode($node)
+     */
+    public static function removeNode(DOMNode|DOMComment|DOMText|DOMElement $node): void
     {
         $parent = $node->parentNode;
         if ($parent) {
@@ -135,13 +121,8 @@ class NodeUtility
     /**
      * Returns the next node. First checks for children (if the flag allows it), then for siblings, and finally
      * for parents.
-     *
-     * @param DOMNode|DOMElement|DOMDocument $originalNode
-     * @param bool $ignoreSelfAndKids
-     *
-     * @return DOMNode
      */
-    public static function getNextNode($originalNode, $ignoreSelfAndKids = false)
+    public static function getNextNode(DOMNode|DOMComment|DOMText|DOMElement|DOMDocument|DOMProcessingInstruction|DOMCdataSection $originalNode, bool $ignoreSelfAndKids = false): DOMNode|DOMComment|DOMText|DOMElement|DOMDocument|DOMProcessingInstruction|DOMCdataSection|null
     {
         /*
          * Traverse the DOM from node to node, starting at the node passed in.
@@ -173,16 +154,12 @@ class NodeUtility
 
     /**
      * Remove all empty DOMNodes from DOMNodeLists.
-     *
-     * @param \DOMNodeList $list
-     *
-     * @return DOMNodeList
      */
-    public static function filterTextNodes(\DOMNodeList $list)
+    public static function filterTextNodes(\DOMNodeList $list): DOMNodeList
     {
         $newList = new DOMNodeList();
         foreach ($list as $node) {
-            if ($node->nodeType !== XML_TEXT_NODE || mb_strlen(trim($node->nodeValue))) {
+            if ($node->nodeType !== XML_TEXT_NODE || !$node->isWhitespaceInElementContent()) {
                 $newList->add($node);
             }
         }
