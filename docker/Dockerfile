@@ -1,4 +1,4 @@
-FROM dunglas/frankenphp:1.12.1-php8.4.18-alpine
+FROM dunglas/frankenphp:1.13.2-php8.4.27-alpine
 
 # Install su-exec and opcache
 RUN apk add --no-cache su-exec && \
