@@ -9,6 +9,7 @@ Generate rich RSS feeds for popular posts from social aggregation websites Reddi
 - [Features](#features)
 - [Motivation](#motivation)
 - [Installation](#installation)
+- [One-click deploy](#one-click-deploy)
 - [Usage](#usage)
 - [Feed options](#feed-options)
 - [Additional configuration](#additional-configuration)
@@ -80,6 +81,10 @@ docker build -f docker/Dockerfile .
 1. Clone this repository somewhere with PHP >= 8.2 installed.
 1. Open `index.php` in a browser to view the front end.
 1. Create an `.env` file in the root directory to override application defaults or to integrate with [Redis](#caching), [Ollama](#ai-summaries), [OpenAI](#ai-summaries), [Readability](#parsers), etc. (see supported [environment variables](#environment-variables))
+
+## One-click deploy
+
+[![Deploy on RepoCloud](https://d16t0pc4846x52.cloudfront.net/deploylobe.svg)](https://repocloud.io/details/Upvote%20RSS/)
 
 ## Usage
 
