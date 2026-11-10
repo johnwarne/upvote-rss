@@ -146,7 +146,10 @@ class Lobsters extends Post {
     $comments = $this->getCachedComments($cache_directory, $cache_object_key, $number_of_comments_to_fetch) ?? [];
 
     if (empty($comments)) {
-      $url = $this->permalink . '.json';
+      // Use the short ID URL: Lobsters can serve an outdated copy of /s/<id>/<slug>.json
+      $url = !empty($this->id)
+        ? 'https://' . $this->instance . '/s/' . $this->id . '.json'
+        : $this->permalink . '.json';
       $curl_response = curlURL($url);
       if (empty($curl_response)) {
         $message = "Empty response when trying to get comments for Lobsters post $this->id";
