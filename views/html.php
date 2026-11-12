@@ -50,59 +50,59 @@ $script_version = DEBUG ? filemtime(__DIR__ . '/../js/script.js') : UPVOTE_RSS_V
 
 		<upvote-rss
 			loading="false"
-			platform='<?php echo PLATFORM; ?>'
-			default-platform='<?php echo DEFAULT_PLATFORM; ?>'
+			platform='<?php echo htmlspecialchars((string)PLATFORM, ENT_QUOTES); ?>'
+			default-platform='<?php echo htmlspecialchars((string)DEFAULT_PLATFORM, ENT_QUOTES); ?>'
 			demo-mode='<?php echo DEMO_MODE ? "true" : "false"; ?>'
 			reddit-enabled='<?php echo REDDIT_USER && REDDIT_CLIENT_ID && REDDIT_CLIENT_SECRET ? "true" : "false"; ?>'
-			reddit-default-domain='<?php echo REDDIT_DEFAULT_DOMAIN; ?>'
-			reddit-default-domain-override='<?php echo REDDIT_DEFAULT_DOMAIN_OVERRIDE; ?>'
-			reddit-domain='<?php echo REDDIT_DOMAIN; ?>'
+			reddit-default-domain='<?php echo htmlspecialchars((string)REDDIT_DEFAULT_DOMAIN, ENT_QUOTES); ?>'
+			reddit-default-domain-override='<?php echo htmlspecialchars((string)REDDIT_DEFAULT_DOMAIN_OVERRIDE, ENT_QUOTES); ?>'
+			reddit-domain='<?php echo htmlspecialchars((string)REDDIT_DOMAIN, ENT_QUOTES); ?>'
 			override-reddit-domain='<?php echo REDDIT_DEFAULT_DOMAIN === REDDIT_DOMAIN ? "false" : "true"; ?>'
-			subreddit='<?php echo SUBREDDIT; ?>'
-			instance='<?php echo INSTANCE; ?>'
-			instance-github-default='<?php echo DEFAULT_GITHUB_INSTANCE; ?>'
-			instance-hacker-news-default='<?php echo DEFAULT_HACKER_NEWS_INSTANCE; ?>'
-			instance-lemmy-default='<?php echo DEFAULT_LEMMY_INSTANCE; ?>'
-			instance-lobsters-default='<?php echo DEFAULT_LOBSTERS_INSTANCE; ?>'
-			instance-mbin-default='<?php echo DEFAULT_MBIN_INSTANCE; ?>'
-			instance-piefed-default='<?php echo DEFAULT_PIEFED_INSTANCE; ?>'
-			instance-reddit-default='<?php echo DEFAULT_REDDIT_INSTANCE; ?>'
-			community='<?php echo COMMUNITY; ?>'
-			community-type='<?php echo COMMUNITY_TYPE; ?>'
-			community-github-default='<?php echo DEFAULT_GITHUB_COMMUNITY; ?>'
-			community-hacker-news-default='<?php echo DEFAULT_HACKER_NEWS_COMMUNITY; ?>'
-			community-lemmy-default='<?php echo DEFAULT_LEMMY_COMMUNITY; ?>'
-			community-lobsters-default='<?php echo DEFAULT_LOBSTERS_COMMUNITY; ?>'
-			community-lobsters-default-category='<?php echo DEFAULT_LOBSTERS_CATEGORY; ?>'
-			community-lobsters-default-tag='<?php echo DEFAULT_LOBSTERS_TAG; ?>'
-			community-mbin-default='<?php echo DEFAULT_MBIN_COMMUNITY; ?>'
-			community-piefed-default='<?php echo DEFAULT_PIEFED_COMMUNITY; ?>'
-			community-reddit-default='<?php echo DEFAULT_SUBREDDIT; ?>'
-			language='<?php echo LANGUAGE; ?>'
-			topic='<?php echo TOPIC; ?>'
+			subreddit='<?php echo htmlspecialchars((string)SUBREDDIT, ENT_QUOTES); ?>'
+			instance='<?php echo htmlspecialchars((string)INSTANCE, ENT_QUOTES); ?>'
+			instance-github-default='<?php echo htmlspecialchars((string)DEFAULT_GITHUB_INSTANCE, ENT_QUOTES); ?>'
+			instance-hacker-news-default='<?php echo htmlspecialchars((string)DEFAULT_HACKER_NEWS_INSTANCE, ENT_QUOTES); ?>'
+			instance-lemmy-default='<?php echo htmlspecialchars((string)DEFAULT_LEMMY_INSTANCE, ENT_QUOTES); ?>'
+			instance-lobsters-default='<?php echo htmlspecialchars((string)DEFAULT_LOBSTERS_INSTANCE, ENT_QUOTES); ?>'
+			instance-mbin-default='<?php echo htmlspecialchars((string)DEFAULT_MBIN_INSTANCE, ENT_QUOTES); ?>'
+			instance-piefed-default='<?php echo htmlspecialchars((string)DEFAULT_PIEFED_INSTANCE, ENT_QUOTES); ?>'
+			instance-reddit-default='<?php echo htmlspecialchars((string)DEFAULT_REDDIT_INSTANCE, ENT_QUOTES); ?>'
+			community='<?php echo htmlspecialchars((string)COMMUNITY, ENT_QUOTES); ?>'
+			community-type='<?php echo htmlspecialchars((string)COMMUNITY_TYPE, ENT_QUOTES); ?>'
+			community-github-default='<?php echo htmlspecialchars((string)DEFAULT_GITHUB_COMMUNITY, ENT_QUOTES); ?>'
+			community-hacker-news-default='<?php echo htmlspecialchars((string)DEFAULT_HACKER_NEWS_COMMUNITY, ENT_QUOTES); ?>'
+			community-lemmy-default='<?php echo htmlspecialchars((string)DEFAULT_LEMMY_COMMUNITY, ENT_QUOTES); ?>'
+			community-lobsters-default='<?php echo htmlspecialchars((string)DEFAULT_LOBSTERS_COMMUNITY, ENT_QUOTES); ?>'
+			community-lobsters-default-category='<?php echo htmlspecialchars((string)DEFAULT_LOBSTERS_CATEGORY, ENT_QUOTES); ?>'
+			community-lobsters-default-tag='<?php echo htmlspecialchars((string)DEFAULT_LOBSTERS_TAG, ENT_QUOTES); ?>'
+			community-mbin-default='<?php echo htmlspecialchars((string)DEFAULT_MBIN_COMMUNITY, ENT_QUOTES); ?>'
+			community-piefed-default='<?php echo htmlspecialchars((string)DEFAULT_PIEFED_COMMUNITY, ENT_QUOTES); ?>'
+			community-reddit-default='<?php echo htmlspecialchars((string)DEFAULT_SUBREDDIT, ENT_QUOTES); ?>'
+			language='<?php echo htmlspecialchars((string)LANGUAGE, ENT_QUOTES); ?>'
+			topic='<?php echo htmlspecialchars((string)TOPIC, ENT_QUOTES); ?>'
 			score-filter-available=<?php echo SCORE_FILTER_AVAILABLE ? "true" : "false"; ?>
 			score-filter-available-platforms='<?php echo htmlspecialchars(json_encode(SCORE_FILTER_AVAILABLE_PLATFORMS), ENT_QUOTES); ?>'
 			threshold-filter-available='<?php echo THRESHOLD_FILTER_AVAILABLE ? "true" : "false"; ?>'
 			threshold-filter-available-platforms='<?php echo htmlspecialchars(json_encode(THRESHOLD_FILTER_AVAILABLE_PLATFORMS), ENT_QUOTES); ?>'
 			average-posts-per-day-filter-available='<?php echo AVERAGE_POSTS_PER_DAY_FILTER_AVAILABLE ? "true" : "false"; ?>'
 			average-posts-per-day-filter-available-platforms='<?php echo htmlspecialchars(json_encode(AVERAGE_POSTS_PER_DAY_FILTER_AVAILABLE_PLATFORMS), ENT_QUOTES); ?>'
-			filter-type='<?php echo FILTER_TYPE; ?>'
-			score='<?php echo SCORE; ?>'
-			score-default-github='<?php echo DEFAULT_GITHUB_SCORE; ?>'
-			score-default-hacker-news='<?php echo DEFAULT_HACKER_NEWS_SCORE; ?>'
-			score-default-lemmy='<?php echo DEFAULT_LEMMY_SCORE; ?>'
-			score-default-lobsters='<?php echo DEFAULT_LOBSTERS_SCORE; ?>'
-			score-default-mbin='<?php echo DEFAULT_MBIN_SCORE; ?>'
-			score-default-piefed='<?php echo DEFAULT_PIEFED_SCORE; ?>'
-			score-default-reddit='<?php echo DEFAULT_REDDIT_SCORE; ?>'
-			threshold-percentage='<?php echo PERCENTAGE; ?>'
-			average-posts-per-day='<?php echo POSTS_PER_DAY; ?>'
+			filter-type='<?php echo htmlspecialchars((string)FILTER_TYPE, ENT_QUOTES); ?>'
+			score='<?php echo htmlspecialchars((string)SCORE, ENT_QUOTES); ?>'
+			score-default-github='<?php echo htmlspecialchars((string)DEFAULT_GITHUB_SCORE, ENT_QUOTES); ?>'
+			score-default-hacker-news='<?php echo htmlspecialchars((string)DEFAULT_HACKER_NEWS_SCORE, ENT_QUOTES); ?>'
+			score-default-lemmy='<?php echo htmlspecialchars((string)DEFAULT_LEMMY_SCORE, ENT_QUOTES); ?>'
+			score-default-lobsters='<?php echo htmlspecialchars((string)DEFAULT_LOBSTERS_SCORE, ENT_QUOTES); ?>'
+			score-default-mbin='<?php echo htmlspecialchars((string)DEFAULT_MBIN_SCORE, ENT_QUOTES); ?>'
+			score-default-piefed='<?php echo htmlspecialchars((string)DEFAULT_PIEFED_SCORE, ENT_QUOTES); ?>'
+			score-default-reddit='<?php echo htmlspecialchars((string)DEFAULT_REDDIT_SCORE, ENT_QUOTES); ?>'
+			threshold-percentage='<?php echo htmlspecialchars((string)PERCENTAGE, ENT_QUOTES); ?>'
+			average-posts-per-day='<?php echo htmlspecialchars((string)POSTS_PER_DAY, ENT_QUOTES); ?>'
 			show-score='<?php echo SHOW_SCORE ? "true" : "false"; ?>'
 			include-content='<?php echo INCLUDE_CONTENT ? "true" : "false"; ?>'
 			summary-enabled='<?php echo SUMMARY_ENABLED ? "true" : "false"; ?>'
 			include-summary='<?php echo INCLUDE_SUMMARY ? "true" : "false"; ?>'
 			include-comments='<?php echo INCLUDE_COMMENTS ? "true" : "false"; ?>'
-			comments='<?php echo COMMENTS; ?>'
+			comments='<?php echo htmlspecialchars((string)COMMENTS, ENT_QUOTES); ?>'
 			comments-available-platforms='<?php echo htmlspecialchars(json_encode(COMMENTS_AVAILABLE_PLATFORMS), ENT_QUOTES); ?>'
 			comments-available='<?php echo COMMENTS_AVAILABLE ? "true" : "false"; ?>'
 			pinned-comments-filter-available='<?php echo PINNED_COMMENTS_FILTER_AVAILABLE ? "true" : "false"; ?>'
@@ -111,7 +111,7 @@ $script_version = DEBUG ? filemtime(__DIR__ . '/../js/script.js') : UPVOTE_RSS_V
 			filter-nsfw='<?php echo FILTER_NSFW ? "true" : "false"; ?>'
 			blur-nsfw='<?php echo BLUR_NSFW ? "true" : "false"; ?>'
 			filter-old-posts='<?php echo FILTER_OLD_POSTS ? "true" : "false"; ?>'
-			post-cutoff-days='<?php echo POST_CUTOFF_DAYS; ?>'
+			post-cutoff-days='<?php echo htmlspecialchars((string)POST_CUTOFF_DAYS, ENT_QUOTES); ?>'
 			cache-size='<?php $cache_size = cache()->getTotalCacheSize(); echo $cache_size; ?>'
 			show-rss-url='true'
 			dark-mode=''
@@ -146,7 +146,7 @@ $script_version = DEBUG ? filemtime(__DIR__ . '/../js/script.js') : UPVOTE_RSS_V
 							</div>
 							<div class="form-group conditional reddit">
 								<label for="subreddit">Subreddit</label>
-								<input list="subreddits" id="subreddit" name="subreddit" placeholder="Subreddit" value="<?php echo SUBREDDIT; ?>" />
+								<input list="subreddits" id="subreddit" name="subreddit" placeholder="Subreddit" value="<?php echo htmlspecialchars((string)SUBREDDIT, ENT_QUOTES); ?>" />
 								<datalist id="subreddits"></datalist>
 							</div>
 							<div class="form-group conditional hacker-news">
@@ -207,25 +207,25 @@ $script_version = DEBUG ? filemtime(__DIR__ . '/../js/script.js') : UPVOTE_RSS_V
 								</div>
 								<div class="form-group">
 									<label for="score" class="sr-only">Score</label>
-									<input type="number" name="score" id="score" placeholder="Score" min="0" pattern="[0-9]*" inputmode="numeric" value="<?php echo SCORE; ?>" />
+									<input type="number" name="score" id="score" placeholder="Score" min="0" pattern="[0-9]*" inputmode="numeric" value="<?php echo htmlspecialchars((string)SCORE, ENT_QUOTES); ?>" />
 								</div>
 								<div class="form-group">
 									<label for="threshold-percentage" class="sr-only">Percentage</label>
-									<input type="number" name="threshold-percentage" id="threshold-percentage" placeholder="Threshold" min="1" pattern="[0-9]*" inputmode="numeric" value="<?php echo PERCENTAGE; ?>" />
+									<input type="number" name="threshold-percentage" id="threshold-percentage" placeholder="Threshold" min="1" pattern="[0-9]*" inputmode="numeric" value="<?php echo htmlspecialchars((string)PERCENTAGE, ENT_QUOTES); ?>" />
 								</div>
 								<div class="form-group">
 									<label for="average-posts-per-day" class="sr-only">Posts Per Day</label>
-									<input type="number" name="average-posts-per-day" id="average-posts-per-day" placeholder="Posts per day" min="1" pattern="[0-9]*" inputmode="numeric" value="<?php echo POSTS_PER_DAY; ?>" />
+									<input type="number" name="average-posts-per-day" id="average-posts-per-day" placeholder="Posts per day" min="1" pattern="[0-9]*" inputmode="numeric" value="<?php echo htmlspecialchars((string)POSTS_PER_DAY, ENT_QUOTES); ?>" />
 								</div>
 							</div>
 							<div id="filter-information" class="filter-information">
 								<dl id="filter-information-definition-list">
 									<dt>Score</dt>
-									<dd>Posts below the specified score <?php if(FILTER_TYPE === 'score') : ?>(<?php echo SCORE; ?>) <?php endif; ?>will be filtered out.</dd>
+									<dd>Posts below the specified score <?php if(FILTER_TYPE === 'score') : ?>(<?php echo htmlspecialchars((string)SCORE, ENT_QUOTES); ?>) <?php endif; ?>will be filtered out.</dd>
 									<dt>Threshold</dt>
-									<dd>Posts below the specified percentage <?php if(FILTER_TYPE === 'threshold') : ?>(<?php echo PERCENTAGE; ?>%) <?php endif; ?>of the community's monthly top posts' average score will be filtered out.</dd>
+									<dd>Posts below the specified percentage <?php if(FILTER_TYPE === 'threshold') : ?>(<?php echo htmlspecialchars((string)PERCENTAGE, ENT_QUOTES); ?>%) <?php endif; ?>of the community's monthly top posts' average score will be filtered out.</dd>
 									<dt>Posts Per Day</dt>
-									<dd>The RSS feed will output roughly the specified number of posts per day <?php if(FILTER_TYPE === 'averagePostsPerDay') : ?>(<?php echo POSTS_PER_DAY; ?>) <?php endif; ?>.</dd>
+									<dd>The RSS feed will output roughly the specified number of posts per day <?php if(FILTER_TYPE === 'averagePostsPerDay') : ?>(<?php echo htmlspecialchars((string)POSTS_PER_DAY, ENT_QUOTES); ?>) <?php endif; ?>.</dd>
 								</dl>
 							</div>
 							<fieldset class="fiddly-bits">
@@ -273,7 +273,7 @@ $script_version = DEBUG ? filemtime(__DIR__ . '/../js/script.js') : UPVOTE_RSS_V
 										</div>
 										<div class="form-group">
 											<label for="comments" class="sr-only">Comments</label>
-											<input type="number" name="comments" id="comments" placeholder="Comments" min="1" pattern="[0-9]*" value="<?php echo COMMENTS; ?>" />
+											<input type="number" name="comments" id="comments" placeholder="Comments" min="1" pattern="[0-9]*" value="<?php echo htmlspecialchars((string)COMMENTS, ENT_QUOTES); ?>" />
 										</div>
 									</div>
 									<div class="form-group checkbox">
@@ -289,7 +289,7 @@ $script_version = DEBUG ? filemtime(__DIR__ . '/../js/script.js') : UPVOTE_RSS_V
 										</div>
 										<div class="form-group">
 											<label for="post-cutoff-days" class="sr-only">Days to keep</label>
-											<input type="number" name="post-cutoff-days" id="post-cutoff-days" placeholder="days to keep" min="1" pattern="[0-9]*" value="<?php echo POST_CUTOFF_DAYS; ?>" />
+											<input type="number" name="post-cutoff-days" id="post-cutoff-days" placeholder="days to keep" min="1" pattern="[0-9]*" value="<?php echo htmlspecialchars((string)POST_CUTOFF_DAYS, ENT_QUOTES); ?>" />
 										</div>
 									</div>
 									<div class="form-group checkbox conditional reddit">
@@ -378,7 +378,7 @@ $script_version = DEBUG ? filemtime(__DIR__ . '/../js/script.js') : UPVOTE_RSS_V
 
 			<!-- Footer -->
 			<footer>
-				<p class="repo-name">Upvote RSS v<?php echo UPVOTE_RSS_VERSION; ?></p>
+				<p class="repo-name">Upvote RSS v<?php echo htmlspecialchars((string)UPVOTE_RSS_VERSION, ENT_QUOTES); ?></p>
 				<p class="repo-link"><a href="https://github.com/johnwarne/upvote-rss/" target="_blank" rel="noopener noreferrer"><svg class="icon icon-github" aria-hidden="true"><use xlink:href="#icon-github"></use></svg>GitHub</a></p>
 				<form class="dark-mode">
 					<fieldset>
