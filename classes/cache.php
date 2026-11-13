@@ -112,9 +112,13 @@ class Cache {
 	 * @return string The normalized directory path
 	 */
 	private function normalizeDirectory(string $directory): string {
-		$directory = ltrim($directory, '/');
-		$directory = rtrim($directory, '/');
-		return $directory;
+		// Drop empty, current (.) and parent (..) path segments so a user-influenced directory
+		// (built from instance/community/slug) cannot traverse outside the cache root.
+		$directory = str_replace('\\', '/', $directory);
+		$parts = array_filter(explode('/', $directory), function ($segment) {
+			return $segment !== '' && $segment !== '.' && $segment !== '..';
+		});
+		return implode('/', $parts);
 	}
 
 	/**

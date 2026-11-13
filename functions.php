@@ -128,46 +128,112 @@ function tidy($string) : string {
  * @param array $options Additional cURL options
  * @return mixed The cURL response
  */
-function curlURL($url, $options = [])
+function urlHostIsPublic($url)
 {
-	$ch = curl_init();
-	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-	curl_setopt($ch, CURLOPT_TIMEOUT, 5);
-	curl_setopt($ch, CURLOPT_URL, $url);
-	curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-	if (!empty($options)) {
-		foreach ($options as $option => $value) {
-			curl_setopt($ch, $option, $value);
+	// SSRF guard: true only if the URL host resolves exclusively to public, globally-routable
+	// addresses. Fails closed on unresolvable hosts.
+	$host = parse_url($url, PHP_URL_HOST);
+	if (!$host) {
+		return false;
+	}
+	$host = trim($host, '[]');
+	$ips = [];
+	if (filter_var($host, FILTER_VALIDATE_IP)) {
+		$ips[] = $host;
+	} else {
+		foreach ([DNS_A, DNS_AAAA] as $type) {
+			$records = @dns_get_record($host, $type);
+			if (is_array($records)) {
+				foreach ($records as $record) {
+					if (!empty($record['ip'])) {
+						$ips[] = $record['ip'];
+					}
+					if (!empty($record['ipv6'])) {
+						$ips[] = $record['ipv6'];
+					}
+				}
+			}
 		}
 	}
-	if (!array_key_exists(CURLOPT_USERAGENT, $options)) {
-		curl_setopt($ch, CURLOPT_USERAGENT, 'Upvote RSS:' . UPVOTE_RSS_VERSION . ' (+https://www.upvote-rss.com)');
+	if (empty($ips)) {
+		return false;
 	}
-	$data = curl_exec($ch);
-	curl_close($ch);
-	if (
-		strpos($data, '403 Forbidden') !== false ||
-		strpos($data, 'Access Denied') !== false ||
-		strpos($data, 'Please enable JS and disable any ad blocker') !== false ||
-		strpos($data, 'unsupported-browser') !== false
-	) {
-		$user_agents = [
-			'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3',
-			'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:129.0) Gecko/20100101 Firefox/129.0'
-		];
+	foreach ($ips as $ip) {
+		if (preg_match('/^::ffff:(\d{1,3}(?:\.\d{1,3}){3})$/i', $ip, $m)) {
+			$ip = $m[1];
+		}
+		if (!filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
+			return false;
+		}
+		if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+			$long = ip2long($ip);
+			if ($long !== false && ($long & 0xffc00000) === (ip2long('100.64.0.0') & 0xffc00000)) {
+				return false;
+			}
+		}
+	}
+	return true;
+}
+
+function curlURL($url, $options = [])
+{
+	// SSRF protection: reject non-public hosts and follow redirects manually so every hop is
+	// re-validated (cURL's own FOLLOWLOCATION would follow a public host's redirect into the
+	// internal network).
+	$doRequest = function ($target, $options, $userAgent) {
+		if (!urlHostIsPublic($target)) {
+			return [false, null];
+		}
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($ch, CURLOPT_TIMEOUT, 5);
-		curl_setopt($ch, CURLOPT_URL, $url);
-		curl_setopt($ch, CURLOPT_USERAGENT, $user_agents[array_rand($user_agents)]);
-		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+		curl_setopt($ch, CURLOPT_URL, $target);
+		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, false);
+		curl_setopt($ch, CURLOPT_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS);
 		if (!empty($options)) {
 			foreach ($options as $option => $value) {
 				curl_setopt($ch, $option, $value);
 			}
 		}
+		if ($userAgent !== null && !array_key_exists(CURLOPT_USERAGENT, $options)) {
+			curl_setopt($ch, CURLOPT_USERAGENT, $userAgent);
+		}
 		$data = curl_exec($ch);
+		$redirect = curl_getinfo($ch, CURLINFO_REDIRECT_URL);
 		curl_close($ch);
+		return [$data, $redirect];
+	};
+
+	$fetch = function ($startUrl, $options, $userAgent) use ($doRequest) {
+		$current = $startUrl;
+		$data = false;
+		for ($i = 0; $i < 5; $i++) {
+			list($data, $redirect) = $doRequest($current, $options, $userAgent);
+			if ($redirect) {
+				$current = $redirect;
+				$data = false;
+				continue;
+			}
+			break;
+		}
+		return $data;
+	};
+
+	$data = $fetch($url, $options, 'Upvote RSS:' . UPVOTE_RSS_VERSION . ' (+https://www.upvote-rss.com)');
+
+	if (
+		is_string($data) && (
+			strpos($data, '403 Forbidden') !== false ||
+			strpos($data, 'Access Denied') !== false ||
+			strpos($data, 'Please enable JS and disable any ad blocker') !== false ||
+			strpos($data, 'unsupported-browser') !== false
+		)
+	) {
+		$user_agents = [
+			'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3',
+			'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:129.0) Gecko/20100101 Firefox/129.0'
+		];
+		$data = $fetch($url, $options, $user_agents[array_rand($user_agents)]);
 	}
 	return $data;
 }
